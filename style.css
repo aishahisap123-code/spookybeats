@@ -118,3 +118,85 @@ body {
     color: var(--text-primary);
 }
 
+input[type="range"] {
+    width: 100%;
+    accent-color: var(--phantom-purple);
+    cursor: pointer;
+}
+
+.pad-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.sfx-pad {
+    background: #1e1628;
+    border: 1fr solid var(--card-border);
+    color: var(--text-primary);
+    padding: 18px 10px;
+    font-size: 0.95rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.sfx-pad:hover {
+    border-color: var(--blood-amber);
+    color: var(--blood-amber);
+    box-shadow: 0 0 10px rgba(255, 85, 0, 0.3);
+}
+
+.sfx-pad:active {
+    transform: scale(0.96);
+    background: var(--blood-amber);
+    color: #fff;
+}
+
+.preset-controls {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.preset-controls input[type="text"] {
+    flex: 1;
+    padding: 8px 12px;
+    background: #09060d;
+    border: 1px solid var(--card-border);
+    color: var(--text-primary);
+    border-radius: 4px;
+}
+
+.btn {
+    background: var(--phantom-purple);
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btn:hover {
+    box-shadow: var(--glow-shadow);
+}
+
+.preset-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.preset-chip {
+    background: #1e1628;
+    border: 1px solid var(--card-border);
+    padding: 6px 12px;
+    border-radius: 15px;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+.preset-chip:hover {
+    border-color: var(--ghost-green);
+    color: var(--ghost-green);
+}
