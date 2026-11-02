@@ -1,0 +1,120 @@
+:root {
+    --bg-dark: #0a070d;
+    --card-bg: #140f1a;
+    --card-border: #2a1f36;
+    --text-primary: #e2d9ee;
+    --text-muted: #9a8bb0;
+
+    --ghost-green: #39ff14;
+    --phantom-purple: #9d4edd;
+    --blood-amber: #ff5500;
+    --glow-shadow: 0 0 12px rgba(157, 78, 221, 0.4);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-primary);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+}
+
+.app-container {
+    width: 100%
+    max-width: 950px;
+}
+
+.app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid var(--card-border);
+}
+
+.app-header h1 {
+    font-size: 1.8rem;
+    letter-spacing: 2px;
+    color: var(--phantom-purple);
+    text-shadow: 0 0 8px rgba(157, 78, 221, 0.6);
+}
+
+.power-btn {
+    background: transparent;
+    border: 2px solid var(--ghost-green);
+    color: var(--ghost-green);
+    padding: 10px 20px;
+    font-weight: bold;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.power-btn:hover {
+    background: var(--ghost-green);
+    color: var(--bg-dark);
+    box-shadow: 0 0 15px var(--ghost-green);
+}
+
+.power-btn:active {
+    background: var(--phantom-purple);
+    border-color: var(--phantom-purple);
+    color: #fff;
+    box-shadow: var(--glow-shadow);
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.card {
+    background: var(--card-bg);
+    border: 1fr solid var(--card-border);
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+}
+
+.card h2 {
+    font-size: 1.2rem;
+    color: var(--text-muted);
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.visualizer-card {
+    grid-column: span 2;
+    text-align: center;
+}
+
+#visualizer {
+    width: 100%;
+    height: 140px;
+    background-color: #050308;
+    border: 1px solid var(--card-border);
+    border-radius: 4px;
+}
+
+.slider-group {
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.slider-group label {
+    font-size: 0.95rem;
+    color: var(--text-primary);
+}
+
