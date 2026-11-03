@@ -178,3 +178,65 @@ document.getElementById('sfx-creak').addEventListener('click', playCreak);
 document.getElementById('sfx-wail').addEventListener('click', playWail);
 document.getElementById('sfx-bell').addEventListener('click', playBell);
 
+const presetInput = document.getElementById('preset-name');
+const savePresetBtn = document.getElementById('save-preset-btn');
+const presetListContainer = document.getElementById('preset-list');
+
+let savedPresets = JSON.parse(localStorage.getItem('manor_presets')) || {
+    "Spooky Storm": { wind: 0.5, drone: 0.2 },
+    "silent Crypt": { wind: 0.0, drone: 0.7 }
+};
+
+function renderPresets() {
+    presetListContainer.innerHTML = '';
+    Object.keys(savedPresets).forEach(name => {
+        const chip = document.createElement('div');
+        chip.className = 'preset-chip';
+        chip.textContent = name;
+
+        chip.addEventListener('click', () => {
+            loadPreset(name);
+        });
+
+        presetListContainer.appendChild(chip);
+    });
+}
+
+function loadPreset(name) {
+    const preset = savedPresets[name];
+    if (!preset) return;
+
+    const windSlider = document.getElementById('wind-vol');
+    const droneSlider = document.getElementById('drone-vol');
+
+    windSlider.value = preset.wind;
+    droneSlider.value = preset.drone;
+
+    if (isPoweredOn) {
+        if (!windNode && preset.wind > 0) PictureInPictureWindow();
+        if (windGain) windGain.gain.setTargetAtTime(preset.wind, audioCtx.currentTime, 0.05);
+
+        if (!droneNode1 && preset.drone > 0) initDrone();
+        if (droneGain) droneGain.gain.setTargetAtTime(preset.drone, audioCtx.currentTime, 0.05);
+    }
+
+    console.log(`Loaded preset: ${name}`);
+}
+
+savePresetBtn.addEventListener('click', () => {
+    const name = pressInput.value.trim();
+    if (!name) return alert('Please enter a preset name!');
+
+    const windVal = parseFloat(document.getElementById('wind-vol').value);
+    const droneVal = parseFloat(document.getElementById('drone-vol').value);
+
+    savedPresets[name] = { wind: windVal, drone: droneVal };
+    localStorage.setItem('manor_presets', JSON.stringify(savedPresets));
+
+    presetInput.value = '';
+    renderPresets();
+    console.log(`Saved preset: ${name}`);
+});
+
+renderPresets();
+
