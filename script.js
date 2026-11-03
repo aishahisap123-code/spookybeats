@@ -254,7 +254,7 @@ function initRain() {
 
     const noiseSource = audioCtx.createBufferSource();
     noiseSource.buffer = buffer;
-    noiseSource,loop = true;
+    noiseSource.loop = true;
 
     const filter = audioCtx.createBiquadFilter();
     filter.type = 'lowpass';
@@ -290,7 +290,7 @@ function initChimes() {
 
         const now = audioCtx.currentTime;
         noteGain.gain.setValueAtTime(0.1, now);
-        noteGain.gain.exponentRampToValueAtTime(0.0001, now + 1.5);
+        noteGain.gain.exponentialRampToValueAtTime(0.0001, now + 1.5);
 
         osc.connect(noteGain);
         noteGain.connect(chimesMasterGain);
@@ -307,7 +307,7 @@ document.getElementById('rain-vol').addEventListener('input', (e) => {
     rainGain.gain.setTargetAtTime(e.target.value, audioCtx.currentTime, 0.05);
 });
 
-document.getElementsById('chimes-vol').addEventListener('input', (e) => {
+document.getElementById('chimes-vol').addEventListener('input', (e) => {
     if (!isPoweredOn) return;
     if (!chimesGain) initChimes();
     chimesGain.gain.setTargetAtTime(e.target.value, audioCtx.currentTime, 0.05);
