@@ -179,8 +179,147 @@ document.getElementById('sfx-wail').addEventListener('click', playWail);
 document.getElementById('sfx-bell').addEventListener('click', playBell);
 
 
-let windowNode = null;
+let windNode = null;
+let windGain = null;
+let rainNode = null;
+let rainGain = null;
+let droneNode1 = null;
+let droneNode2 = null;
+let droneGain = null;
+let chimesGain = null;
 
+
+function initWind() {
+    const bufferSize = audioCtx.sampleRate * 2;
+    const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+        data[i] = Math.random() * 2 - 1;
+    }
+    const noise = audioCtx.createBufferSource();
+    noise.buffer = buffer;
+    noise.loop = true;
+
+    const filter = audioCtx.createBufferSource();
+    filter.type = 'lowpass';
+    filter.frequency.value = 300;
+
+    windGain =audioCtx.createGain();
+    windGain.gain.value = 0;
+
+    noise.connect(filter);
+    filter.connect(windGain);
+    windGain.connect(masterGain);
+
+    noise.start();
+    windNode = windGain;
+}
+
+function initRain() {
+    const bufferSize = audioCtx.sampleRate * 2;
+    const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+        data[i] = Math.random() * 2 - 1;
+    }
+
+    const noiseSource = audioCtx.createBufferSource();
+    noiseSource.buffer = buffer;
+    noiseSource.loop = true;
+
+    const filter = audioCtx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.value = 1000;
+
+    rainGain = audioCtx.createGain();
+    rainGain.gain.value = 1000;
+
+    rainGain = audioCtx.createGain();
+    rainGain.gain.value = 0;
+
+    noiseSource.connect(filter);
+    filter.connect(rainGain);
+    rainGain.connect(masterGain);
+
+    noiseSource.start();
+    rainNode = rainGain;
+}
+
+function initDrone() {
+    droneNode1 = audioCtx.createOscillator();
+    droneNode2 = audioCtx.createOscillator();
+    droneGain = audioCtx.createGain();
+
+    droneNode1.type = 'sawtooth';
+    droneNode2.type = 'triangle';
+
+    droneNode1.frequency.value = 55;
+    droneNode2.frequency.value = 58.27;
+
+    droneGain.gain.value = 0;
+
+    droneNode1.connect(droneGain);
+    droneNode2.connect(droneGain);
+    droneGain.connect(masterGain);
+
+    droneNode1.start();
+    droneNode2.start();
+}
+
+function initChimes() {
+    const chimesMasterGain = audioCtx.createGain();
+    chimesMasterGain.gain.value = 0;
+    chimesGain = chimesMasterGain;
+
+    chimesMasterGain.connect(masterGain);
+
+    setInterval(() => {
+        if (!isPoweredOn || !chimesGain || chimesGain.gain.value <= 0.01) return;
+
+        const osc = audioCtx.createOscillator();
+        const noteGain = audioCtx.createGain();
+
+        const notes = [1046.50, 1174.66, 1318.51, 1567.98, 1760.00];
+        osc.frequency.value = notes[Math.floor(Math.random() * notes.length)];
+        osc.type = 'sine';
+
+        const now = audioCtx.currentTime;
+        noteGain.gain.setValueAtTime(0.1, now);
+        noteGain.gain.exponentialRampToValueAtTime(0.0001, now + 1.5);
+
+        osc.connect(noteGain);
+        noteGain.connect(chimesMasterGain);
+
+        osc.start(now);
+        osc.stop(now + 1.5);
+    }, 800);
+
+}
+
+
+document.getElementById('wind-vol').addEventListener('input', (e) => {
+    if (!isPoweredOn) return;
+    if (!windNode) initWind();
+    windGain.gain.setTargetAtTime(e.target.value, audioCtx.currentTime, 0.05);
+});
+
+document.getElementById('rain-vol').addEventListener('input', (e) => {
+    if (!isPoweredOn) return;
+    if (!rainNode) initRain();
+    rainGain.gain.setTargetAtTime(e.target.value, audioCtx.currentTime, 0.05);
+});
+
+document.getElementById('drone-vol').addEventListener('input', (e) => {
+    if (!isPoweredOn) return;
+    if (!droneNode1) initDrone();
+    droneGain.gain.setTargetAtTime(e.target.value, audioCtx.currentTime, 0.05);
+});
+
+document.getElementById('chimes-vol').addEventListener('input', (e) => {
+    if (!isPoweredOn) return;
+    if (!chimesGain) initChimes();
+    chimesGain.gain.setTargetAtTime(e.target.value, audioCtx.currentTime, 0.05);
+});
 
 
 
