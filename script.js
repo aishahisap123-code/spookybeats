@@ -46,10 +46,11 @@ function startVisualizerLoop() {
         canvasCtx.beginPath();
 
         const sliceWidth = visualizerCanvas.width / 100;
+        const centerY = visualizerCanvas.height / 2;
         let x = 0;
 
         for (let i = 0; i < 100; i++) {
-            const v = Math.sin((i + Date.now() * 0.005) * 0.1) * 20 + 0.75;
+            const v = Math.sin((i + Date.now() * 0.005) * 0.1) * 20 + centerY;
             if (i ===0) {
                 canvasCtx.moveTo(x, v);
             } else {
@@ -60,4 +61,36 @@ function startVisualizerLoop() {
         canvasCtx.stroke();
     }
     draw();
+}
+
+function playThunder() {
+    if (!isPoweredOn) return;
+
+    const bufferSize = audioCtx.sampleRate * 3;
+    const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+        data[1] = (Math.random() * 2 - 1);
+    }
+
+    const noise = audioCtx.createBufferSource();
+    noise.buffer = buffer;
+
+    const filter = audioCtx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.value = 120;
+
+    const sfxGain = audioCtx.createGain();
+    sfxGain.gain.setValueAtTime(1.0, audioCtx.currentTime);
+    sfxGain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 3.0);
+
+    noise.connect(filter);
+    filter.coonect(sfxGain);
+    sfxGain.connect(masterGain);
+
+    noise.start();
+}
+
+function playCreak() {
+    if (!isPowered)
 }
