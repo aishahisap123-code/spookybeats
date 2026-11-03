@@ -66,11 +66,11 @@ function startVisualizerLoop() {
 function playThunder() {
     if (!isPoweredOn) return;
 
-    const bufferSize = audioCtx.sampleRate * 3;
+    const bufferSize = audioCtx.sampleRate * 4;
     const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
     const data = buffer.getChannelData(0);
     for (let i = 0; i < bufferSize; i++) {
-        data[i] = (Math.random() * 2 - 1);
+        data[i] = (Math.random() * 2 - 1) * 1.5;
     }
 
     const noise = audioCtx.createBufferSource();
@@ -78,7 +78,7 @@ function playThunder() {
 
     const filter = audioCtx.createBiquadFilter();
     filter.type = 'lowpass';
-    filter.frequency.value = 120;
+    filter.frequency.value = 180;
 
     const sfxGain = audioCtx.createGain();
     sfxGain.gain.setValueAtTime(1.0, audioCtx.currentTime);
@@ -98,19 +98,22 @@ function playCreak() {
     const sfxGain = audioCtx.createGain();
 
     osc.type = 'sawtooth';
+    
+    const now = audioCtx.currentTime;
+    osc.frequency.setValueAtTime(250, now);
+    osc.frequency.linearRampToValueAtTime(400, now + 0.2);
+    osc.frequency.linearRampToValueAtTime(320, now + 0.4);
+    osc.frequency.linearRampToValueAtTime(480, now + 0.7);
+    osc.frequency.linearRampToValueAtTime(300, now + 1.0);
 
-    osc.frequency.setValueAtTime(300, audioCtx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(450, audioCtx.currentTime + 0.4);
-    osc.frequency.linearRampToValueAtTime(350, audioCtx.currentTime + 0.8);
-
-    sfxGain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-    sfxGain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.8);
+    sfxGain.gain.setValueAtTime(0.4, now);
+    sfxGain.gain.exponentialRampToValueAtTime(0.001, now + 1.0);
 
     osc.connect(sfxGain);
     sfxGain.connect(masterGain);
 
     osc.start();
-    osc.stop(audioCtx.currentTime + 0.8);
+    osc.stop(now + 1.0);
 } 
 
 function playWail() {
@@ -139,20 +142,28 @@ function playWail() {
 function playBell() {
     if (!isPoweredOn) return;
 
-    const osc = audioCtx.createOscillator();
-    const sfxGain = audioCtx.createGain();
+    const now = audioCtx.currentTime;
 
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(220, audioCtx.currentTime);
+    const freqs = [220, 616, 880]; 
+    
+    freqs.forEach((f, index) => {
+        const osc = audioCtx.createOscillator();
+        const bellGain = audioCtx.createGain();
 
-    sfxGain.gain.setValueAtTime(0.5, audioCtx.currentTime);
-    sfxGain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 2.0);
+        osc.type = index === 0 ? 'sine' : 'triangle';
+        osc.frequency.setValueAtTime(f, now);
 
-    osc.connect(sfxGain);
-    sfxGain.connect(masterGain);
+        const decay = 3.0 - (index * 0.7);
+        bellGain.gain.setValueAtTime(0.4 / (index + 1), now);
+        bellGain.gain.exponentialRampToValueAtTime(0.0001, now + decay);
 
-    osc.start();
-    osc.stop(audioCtx.currentTime + 2.0);
+        osc.connect(bellGain);
+        bellGain.connect(masterGain);
+
+        osc.start();
+        osc.stop(now + decay);
+    });
+
 }
 
 document.getElementById('sfx-thunder').addEventListener('click', playThunder);
