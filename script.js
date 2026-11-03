@@ -240,3 +240,75 @@ savePresetBtn.addEventListener('click', () => {
 
 renderPresets();
 
+let rainNode = null;
+let rainGain = null;
+let chimesGain = null;
+
+function initRain() {
+    const bufferSize = audioCtx.sampleRate * 2;
+    const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+        data[i] = Math.random() * 2 - 1;
+    }
+
+    const noiseSource = audioCtx.createBufferSource();
+    noiseSource.buffer = buffer;
+    noiseSource,loop = true;
+
+    const filter = audioCtx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.value = 1000;
+
+    rainGain = audioCtx.createGain();
+    rainGain.gain.value = 0;
+
+    noiseSource.connect(filter);
+    filter.connect(rainGain);
+    rainGain.connect(masterGain);
+
+    noiseSource.start();
+    rainNode = rainGain;
+}
+
+function initChimes() {
+    const chimesMasterGain = audioCtx.createGain();
+    chimesMasterGain.gain.value = 0;
+    chimesGain = chimesMasterGain;
+
+    chimesMasterGain.connect(masterGain);
+
+    setInterval(() => {
+        if (!isPoweredOn || !chimesGain || chimesGain.gain.value <= 0.01) return;
+
+        const osc = audioCtx.createOscillator();
+        const noteGain = audioCtx.createGain();
+
+        const notes  = [1046.50, 1174.66, 1318.51, 1567.98, 1760.00];
+        osc.frequency.value = notes[Math.floor(Math.random() * notes.length)];
+        osc.type = 'sine';
+
+        const now = audioCtx.currentTime;
+        noteGain.gain.setValueAtTime(0.1, now);
+        noteGain.gain.exponentRampToValueAtTime(0.0001, now + 1.5);
+
+        osc.connect(noteGain);
+        noteGain.connect(chimesMasterGain);
+
+        osc.start(now);
+        osc.stop(now + 1.5);
+        
+    }, 800);
+}
+
+document.getElementById('rain-vol').addEventListener('input', (e) => {
+    if (!isPoweredOn) return;
+    if (!rainNode) initRain();
+    rainGain.gain.setTargetAtTime(e.target.value, audioCtx.currentTime, 0.05);
+});
+
+document.getElementsById('chimes-vol').addEventListener('input', (e) => {
+    if (!isPoweredOn) return;
+    if (!chimesGain) initChimes();
+    chimesGain.gain.setTargetAtTime(e.target.value, audioCtx.currentTime, 0.05);
+});
