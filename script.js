@@ -213,7 +213,7 @@ function loadPreset(name) {
     droneSlider.value = preset.drone;
 
     if (isPoweredOn) {
-        if (!windNode && preset.wind > 0) PictureInPictureWindow();
+        if (!windNode && preset.wind > 0) initWind();
         if (windGain) windGain.gain.setTargetAtTime(preset.wind, audioCtx.currentTime, 0.05);
 
         if (!droneNode1 && preset.drone > 0) initDrone();
@@ -224,7 +224,7 @@ function loadPreset(name) {
 }
 
 savePresetBtn.addEventListener('click', () => {
-    const name = pressInput.value.trim();
+    const name = presetInput.value.trim();
     if (!name) return alert('Please enter a preset name!');
 
     const windVal = parseFloat(document.getElementById('wind-vol').value);
