@@ -94,26 +94,33 @@ function playThunder() {
 function playCreak() {
     if (!isPoweredOn) return;
 
-    const osc = audioCtx.createOscillator();
-    const sfxGain = audioCtx.createGain();
-
-    osc.type = 'sawtooth';
     
-    const now = audioCtx.currentTime;
-    osc.frequency.setValueAtTime(250, now);
-    osc.frequency.linearRampToValueAtTime(400, now + 0.2);
-    osc.frequency.linearRampToValueAtTime(320, now + 0.4);
-    osc.frequency.linearRampToValueAtTime(480, now + 0.7);
-    osc.frequency.linearRampToValueAtTime(300, now + 1.0);
+    const bufferSize = audioCtx.sampleRate * 0.8; 
+    const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+        data[i] = Math.random() * 2 - 1;
+    }
 
-    sfxGain.gain.setValueAtTime(0.4, now);
-    sfxGain.gain.exponentialRampToValueAtTime(0.001, now + 1.0);
+    const noise = audioCtx.createBufferSource();
+    noise.buffer = buffer;
 
-    osc.connect(sfxGain);
+    const filter = audioCtx.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.frequency.setValueAtTime(800, audioCtx.currentTime);
+    filter.frequency.linearRampToValueAtTime(1400, audioCtx.currentTime + 0.3);
+    filter.frequency.linearRampToValueAtTime(700, audioCtx.currentTime + 0.8);
+    filter.Q.value = 12; 
+
+    const sfxGain = audioCtx.createGain();
+    sfxGain.gain.setValueAtTime(0.8, audioCtx.currentTime);
+    sfxGain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.8);
+
+    noise.connect(filter);
+    filter.connect(sfxGain);
     sfxGain.connect(masterGain);
 
-    osc.start();
-    osc.stop(now + 1.0);
+    noise.start();
 } 
 
 function playWail() {
