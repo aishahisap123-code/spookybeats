@@ -92,5 +92,68 @@ function playThunder() {
 }
 
 function playCreak() {
-    if (!isPowered)
+    if (!isPowered) return;
+
+    const osc = audioCtx.createOscillator();
+    const sfxGain = audioCtx.createGain();
+
+    osc.type = 'sawtooth';
+
+    osc.frequency.setValueAtTime(300, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(450, audioCtx.currentTime + 0.4);
+    osc.frequency.linearRampToValueAtTime(350, audioCtx.currentTime + 0.8);
+
+    sfxGain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+    sfxGain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.8);
+
+    osc.connect(sfxGain);
+    sfxGain.connect(masterGain);
+
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.08);
+} 
+
+function playWail() {
+    if (!isPoweredOn) return;
+
+    const osc = audioCtx.createOscillator();
+    const sfxGain = audioCtx.createGain();
+
+    osc.type = 'sine';
+
+    osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+    osc.frequency.linearRampToValueAtTime(900, audioCtx.currentTime + 0.6);
+    osc.frequency.linearRampToValueAtTime(500, audioCtx.currentTime + 1.5);
+
+    sfxGain.gain.setValueAtTime(0, audioCtx.currentTime);
+    sfxGain.gain.linearRampToValueAtTime(0.2, audioCtx.currentTime + 0.4);
+    sfxGain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.5);
+
+    osc.connect(sfxGain);
+    sfxGain.connect(masterGain);
+
+    osc.start();
+    osc.stop(audioCtx.currentTime + 1.5);
 }
+
+function playBell() {
+    if (!isPoweredOn) return;
+
+    const osc = audioCtx.createOscillator();
+    const sfxGain = audioCtx.Gain();
+
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(220, audioCtx.currentTime);
+
+    sfxGain.gain.setValueAtTime(0.5, audioCtx.currentTime);
+    sfxGain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 2.0);
+
+    osc.connect(sfxGain);
+    osc.stop(audioCtx.currentTime + 2.0);
+}
+
+document.getElementById('sfx-thunder').addEventListener('click', playThunder);
+document.getElementById('sfx-creak').addEventListener('click', playCreak);
+document.getElementById('sfx-wail').addEventListener('click', playWail);
+document.getElementById('sfx-bell').addEventListener('click', playBell);
+
