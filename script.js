@@ -70,7 +70,7 @@ function playThunder() {
     const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
     const data = buffer.getChannelData(0);
     for (let i = 0; i < bufferSize; i++) {
-        data[1] = (Math.random() * 2 - 1);
+        data[i] = (Math.random() * 2 - 1);
     }
 
     const noise = audioCtx.createBufferSource();
@@ -85,14 +85,14 @@ function playThunder() {
     sfxGain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 3.0);
 
     noise.connect(filter);
-    filter.coonect(sfxGain);
+    filter.connect(sfxGain);
     sfxGain.connect(masterGain);
 
     noise.start();
 }
 
 function playCreak() {
-    if (!isPowered) return;
+    if (!isPoweredOn) return;
 
     const osc = audioCtx.createOscillator();
     const sfxGain = audioCtx.createGain();
@@ -110,7 +110,7 @@ function playCreak() {
     sfxGain.connect(masterGain);
 
     osc.start();
-    osc.stop(audioCtx.currentTime + 0.08);
+    osc.stop(audioCtx.currentTime + 0.8);
 } 
 
 function playWail() {
@@ -140,7 +140,7 @@ function playBell() {
     if (!isPoweredOn) return;
 
     const osc = audioCtx.createOscillator();
-    const sfxGain = audioCtx.Gain();
+    const sfxGain = audioCtx.createGain();
 
     osc.type = 'sine';
     osc.frequency.setValueAtTime(220, audioCtx.currentTime);
@@ -149,6 +149,9 @@ function playBell() {
     sfxGain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 2.0);
 
     osc.connect(sfxGain);
+    sfxGain.connect(masterGain);
+
+    osc.start();
     osc.stop(audioCtx.currentTime + 2.0);
 }
 
