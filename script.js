@@ -2,6 +2,7 @@ let audioCtx = null;
 let isPoweredOn = false;
 
 let masterGain = null;
+let analyser = null;
 
 const powerBtn = document.getElementById('power-btn');
 const visualizerCanvas = document.getElementById('visualizer');
@@ -18,7 +19,12 @@ powerBtn.addEventListener('click', () => {
 
         masterGain = audioCtx.createGain();
         masterGain.gain.setValueAtTime(0.8, audioCtx.currentTime);
-        masterGain.connect(audioCtx.destination);
+
+
+        analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 2048;
+        masterGain.connect(analyser);
+        analyser.connect(audioCtx.destination);
 
         
         isPoweredOn = true;
@@ -27,10 +33,24 @@ powerBtn.addEventListener('click', () => {
 
         console.log("Audio Engine Initialized");
         startVisualizerLoop();
-    } else {
 
+        const 
+
+
+
+    } else {
         audioCtx.close();
         isPoweredOn = false;
+
+        windNode = null;
+        windGain = null;
+        rainNode = null;
+        rainGain = null;
+        droneNode1 = null;
+        droneNode2 = null;
+        droneGain = null;
+        chimesGain = null;
+
         powerBtn.textContent = 'Power Audio Engine';
         powerBtn.classList.remove('active');
         console.log("Audio Engine Suspended");
@@ -38,31 +58,39 @@ powerBtn.addEventListener('click', () => {
 });
 
 function startVisualizerLoop() {
+    const bufferLength = analyser.fftSize;
+    const dataArray = new Uint8Array(bufferLength);
+
     function draw() {
         requestAnimationFrame(draw);
 
         canvasCtx.fillStyle = '#050308';
         canvasCtx.fillRect(0, 0, visualizerCanvas.clientWidth, visualizerCanvas.height);
 
-        if (!isPoweredOn) return;
+        if (!isPoweredOn || !analyser) return;
+
+        analyser.getByteTimeDomainData(dataArray);
 
         canvasCtx.lineWidth = 2;
         canvasCtx.strokeStyle = '#39ff14';
         canvasCtx.beginPath();
 
-        const sliceWidth = visualizerCanvas.width / 100;
-        const centerY = visualizerCanvas.height / 2;
+        const sliceWidth = visualizerCanvas.clientWidth / bufferLength;
         let x = 0;
 
-        for (let i = 0; i < 100; i++) {
-            const v = Math.sin((i + Date.now() * 0.005) * 0.1) * 20 + centerY;
+        for (let i = 0; i < bufferLength; i++) {
+            const v = dataArray[i] / 128.0;
+            const y = v * (visualizerCanvas.height / 2);
+           
             if (i ===0) {
-                canvasCtx.moveTo(x, v);
+                canvasCtx.moveTo(x, y);
             } else {
-                canvasCtx.lineTo(x, v);
+                canvasCtx.lineTo(x, y);
             }
             x += sliceWidth;
         }
+
+        canvasCtx.lineTo(visualizerCanvas.width, visualizerCanvas.height / 2);
         canvasCtx.stroke();
     }
     draw();
