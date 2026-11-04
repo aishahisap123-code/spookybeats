@@ -10,12 +10,17 @@ const canvasCtx = visualizerCanvas.getContext('2d');
 powerBtn.addEventListener('click', () => {
     if (!isPoweredOn) {
 
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        audioCtx = new window.AudioContext();
+
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+
         masterGain = audioCtx.createGain();
-        masterGain.gain.value = 0.8;
+        masterGain.gain.setValueAtTime(0.8, audioCtx.currentTime);
         masterGain.connect(audioCtx.destination);
 
-        audioCtx.resume();
+        
         isPoweredOn = true;
         powerBtn.textContent = 'Engine Active';
         powerBtn.classList.add('active');
@@ -24,7 +29,7 @@ powerBtn.addEventListener('click', () => {
         startVisualizerLoop();
     } else {
 
-        audioCtx.suspend();
+        audioCtx.close();
         isPoweredOn = false;
         powerBtn.textContent = 'Power Audio Engine';
         powerBtn.classList.remove('active');
@@ -70,7 +75,7 @@ function playThunder() {
     const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
     const data = buffer.getChannelData(0);
     for (let i = 0; i < bufferSize; i++) {
-        data[i] = (Math.random() * 2 - 1) * 1.5;
+        data[i] = (Math.random() * 2 - 1) * 3;
     }
 
     const noise = audioCtx.createBufferSource();
