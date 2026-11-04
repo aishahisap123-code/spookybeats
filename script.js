@@ -52,7 +52,7 @@ powerBtn.addEventListener('click', () => {
             if (droneGain) droneGain.gain.setValueAtTime(droneVal, audioCtx.currentTime);
         }
 
-        const chimesVal = parseFloat(document.getElementById('chimes-vol').value);
+        const chimesVal = parseFloat(document.getElementById('chime-vol').value);
         if (chimesVal > 0) {
             initChimes();
             if (chimesGain) chimesGain.gain.setValueAtTime(chimesVal, audioCtx.currentTime);
