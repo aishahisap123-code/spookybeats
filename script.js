@@ -331,10 +331,15 @@ const presetInput = document.getElementById('preset-name');
 const savePresetBtn = document.getElementById('save-preset-btn');
 const presetListContainer = document.getElementById('preset-list');
 
-let savedPresets = JSON.parse(localStorage.getItem('manor_presets')) || {
+let savedPresets = JSON.parse(localStorage.getItem('manor_presets'));
+if (!savedPresets || Object.keys(savedPresets).length === 0) {
+    savedPresets = {
     "Spooky Storm": { wind: 0.5, rain: 0.8, drone: 0.2, chimes: 0.0 },
     "Silent Crypt": { wind: 0.0, rain: 0.0, drone: 0.7, chimes: 0.3 }
+    };
+    localStorage.setItem('manor_presets', JSON.stringify(savedPresets));
 };
+
 
 function renderPresets() {
     presetListContainer.innerHTML = '';
@@ -374,7 +379,7 @@ function loadPreset(name) {
     const windSlider = document.getElementById('wind-vol');
     const rainSlider = document.getElementById('rain-vol');
     const droneSlider = document.getElementById('drone-vol');
-    const chimesSlider = document.getElementById('chimes-vol');
+    const chimesSlider = document.getElementById('chime-vol');
 
     windSlider.value = preset.wind ?? 0;
     rainSlider.value = preset.rain ?? 0;
@@ -422,7 +427,7 @@ savePresetBtn.addEventListener('click', () => {
     const windVal = parseFloat(document.getElementById('wind-vol').value);
     const rainVal = parseFloat(document.getElementById('rain-vol').value);
     const droneVal = parseFloat(document.getElementById('drone-vol').value);
-    const chimesVal = parseFloat(document.getElementById('chimes-vol').value);
+    const chimesVal = parseFloat(document.getElementById('chime-vol').value);
 
     savedPresets[name] = { wind: windVal, rain: rainVal, drone: droneVal, chimes: chimesVal };
     localStorage.setItem('manor_presets', JSON.stringify(savedPresets));
