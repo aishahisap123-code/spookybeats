@@ -4,6 +4,10 @@ let isPoweredOn = false;
 let masterGain = null;
 let analyser = null;
 
+let reverbNode = null;
+let reverbGain = null;
+let isReverbActive = false;
+
 const powerBtn = document.getElementById('power-btn');
 const visualizerCanvas = document.getElementById('visualizer');
 const canvasCtx = visualizerCanvas.getContext('2d');
@@ -109,6 +113,51 @@ powerBtn.addEventListener('click', () => {
     }
 });
 
+function initReverbChain() {
+    if (!audioCtx) return;
+
+    reverbNode = audioCtx.createDelay();
+    reverbNode.delayTime.value = 0.35;
+
+    const feedbackGain = audioCtx.createGain();
+    feedbackGain.gain.value = 0.4;
+
+    const filter = audioCtx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.value = 1200;
+
+    reverbGain = audioCtx.createGain();
+    reverbGain.gain.value = isReverbActive ? 0.35 : 0.0;
+
+    reverbNode.connect(filter);
+    filter.connect(feedbackGain);
+    feedbackGain.connect(reverbNode);
+
+    reverbNode.connect(reverbGain);
+    reverbGain.connect(masterGain);
+}
+
+const reverbBtn = document.getElementById('reverb-toggle-btn');
+const reverbStatus = document.getElementById('reverb-status');
+
+reverbBtn.addEventListener('click', () => {
+    isReverbActive = !isReverbActive;
+
+    if (isReverbActive) {
+        reverbBtn.classList.add('active');
+        reverbStatus.textContent = 'ON';
+        if (reverbGain && audioCtx) {
+            reverbGain.gain.setValueAtTime(0.35, audioCtx.currentTime);
+        }
+    } else {
+        reverbBtn.classList.remove('active');
+        reverbStatus.textContent = 'OFF';
+        if (reverbGain && audioCtx) {
+            reverbGain.gain.setValueAtTime(0.0, audioCtx.currentTime);
+        }
+    }
+});
+
 function startVisualizerLoop() {
     const bufferLength = analyser.fftSize;
     const dataArray = new Uint8Array(bufferLength);
@@ -182,7 +231,9 @@ function playThunder() {
 
     noise.connect(filter);
     filter.connect(sfxGain);
+
     sfxGain.connect(masterGain);
+    if (reverbNode) sfxGain.connect(reverbNode);
 
     noise.start();
 }
@@ -215,6 +266,7 @@ function playCreak() {
     noise.connect(filter);
     filter.connect(sfxGain);
     sfxGain.connect(masterGain);
+    if (reverbNode) sfxGain.connect(reverbNode);
 
     noise.start();
 } 
@@ -237,6 +289,7 @@ function playWail() {
 
     osc.connect(sfxGain);
     sfxGain.connect(masterGain);
+    if (reverbNode) sfxGain.connect(reverbNode);
 
     osc.start();
     osc.stop(audioCtx.currentTime + 1.5);
@@ -262,6 +315,7 @@ function playBell() {
 
         osc.connect(bellGain);
         bellGain.connect(masterGain);
+        if (reverbNode) bellGain.connect(reverbNode);
 
         osc.start();
         osc.stop(now + decay);
