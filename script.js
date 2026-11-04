@@ -60,9 +60,11 @@ powerBtn.addEventListener('click', () => {
         masterGain.connect(analyser);
         analyser.connect(audioCtx.destination);
 
+        initReverbChain();
         
         isPoweredOn = true;
         powerBtn.textContent = 'Engine Active';
+
         powerBtn.classList.add('active');
 
         console.log("Audio Engine Initialized");
