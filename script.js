@@ -377,19 +377,35 @@ function loadPreset(name) {
     chimesSlider.value = preset.chimes ?? 0;
 
     if (isPoweredOn) {
-        if (!windNode && preset.wind > 0) initWind();
-        if (windGain) windGain.gain.setTargetAtTime(preset.wind ?? 0, audioCtx.currentTime, 0.05);
+     
+        if (preset.wind > 0) {
+            if (!windNode) initWind();
+            if (windGain) windGain.gain.setTargetAtTime(preset.wind, audioCtx.currentTime, 0.05);
+        } else if (windGain) {
+            windGain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.05);
+        }
 
-        if (!rainNode && (preset.rain ?? 0) > 0) initRain();
-        if (rainGain) rainGain.gain.setTargetAtTime(preset.rain ?? 0, audioCtx.currentTime, 0.05);
+        if (preset.rain > 0) {
+            if (!rainNode) initRain();
+            if (rainGain) rainGain.gain.setTargetAtTime(preset.rain, audioCtx.currentTime, 0.05);
+        } else if (rainGain) {
+            rainGain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.05);
+        }
 
-        if (!droneNode1 && (preset.drone ?? 0) > 0) initDrone();
-        if (droneGain) droneGain.gain.setTargetAtTime(preset.drone ?? 0, audioCtx.currentTime, 0.05);
+        if (preset.drone > 0) {
+            if (!droneNode1) initDrone();
+            if (droneGain) droneGain.gain.setTargetAtTime(preset.drone, audioCtx.currentTime, 0.05);
+        } else if (droneGain) {
+            droneGain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.05);
+        }
 
-        if (!chimesGain && (preset.chimes ?? 0) > 0) initChimes();
-        if (chimesGain) chimesGain.gain.setTargetAtTime(preset.chimes ?? 0, audioCtx.currentTime, 0.05);
+        if (preset.chimes > 0) {
+            if (!chimesGain) initChimes();
+            if (chimesGain) chimesGain.gain.setTargetAtTime(preset.chimes, audioCtx.currentTime, 0.05);
+        } else if (chimesGain) {
+            chimesGain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.05);
+        }
     }
-
     console.log(`Loaded preset: ${name}`)
 
 }
