@@ -123,6 +123,15 @@ function startVisualizerLoop() {
 
         analyser.getByteTimeDomainData(dataArray);
 
+        let sum = 0;
+        for (let i = 0; i < bufferLength; i++) {
+            let val = Math.abs(dataArray[i] - 128);
+            sum += val;
+        }
+        let averageVolume = sum / bufferLength;
+
+        document.body.style.boxShadow = `inset 0 0 ${Math.floor(50 + averageVolume * 3)}px rgba(57, 255, 20, ${0.05 + averageVolume * 0.01})`;
+
         canvasCtx.lineWidth = 2;
         canvasCtx.strokeStyle = '#39ff14';
         canvasCtx.beginPath();
@@ -150,6 +159,8 @@ function startVisualizerLoop() {
 
 function playThunder() {
     if (!isPoweredOn) return;
+
+    triggerLightning();
 
     const bufferSize = audioCtx.sampleRate * 4;
     const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
@@ -519,3 +530,18 @@ savePresetBtn.addEventListener('click', () => {
 
 renderPresets();
 
+function triggerLightning() {
+    const overlay = document.getElementById('lightning-overlay');
+    if (!overlay) return;
+
+    overlay.classList.add('flash');
+    setTimeout(() => {
+        overlay.classList.remove('flash');
+        setTimeout(() => {
+            overlay.classList.add('flash');
+            setTimeout(() => {
+                overlay.classList.remove('flash');
+            }, 80);
+        }, 120);
+    }, 60);
+}

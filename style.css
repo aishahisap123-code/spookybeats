@@ -208,3 +208,20 @@ input[type="range"] {
     box-shadow: 0 0 15px #39ff14;
     transition: all 0.1s ease;
 }
+
+#lightning-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: white;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 9999;
+    transition: opacity 0.05s ease-out;
+}
+
+#lightning-overlay.flash {
+    opacity: 0.85;
+}
