@@ -34,7 +34,29 @@ powerBtn.addEventListener('click', () => {
         console.log("Audio Engine Initialized");
         startVisualizerLoop();
 
-        const 
+        const windVal = parseFloat(document.getElementById('wind-vol').value);
+        if (windVal > 0) {
+            initWind();
+            if (windGain) windGain.gain.setValueAtTime(windVal, audioCtx.currentTime);
+        }
+
+        const rainVal = parseFloat(document.getElementById('rain-vol').value);
+        if (rainVal > 0) {
+            initRain();
+            if (rainGain) rainGain.gain.setValueAtTime(rainVal, audioCtx.currentTime);
+        }
+
+        const droneVal = parseFloat(document.getElementById('drone-vol').value);
+        if (droneVal > 0) {
+            initDrone();
+            if (droneGain) droneGain.gain.setValueAtTime(droneVal, audioCtx.currentTime);
+        }
+
+        const chimesVal = parseFloat(document.getElementById('chimes-vol').value);
+        if (chimesVal > 0) {
+            initChimes();
+            if (chimesGain) chimesGain.gain.setValueAtTime(chimesVal, audioCtx.currentTime);
+        }
 
 
 
