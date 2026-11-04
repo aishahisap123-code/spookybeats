@@ -8,6 +8,36 @@ const powerBtn = document.getElementById('power-btn');
 const visualizerCanvas = document.getElementById('visualizer');
 const canvasCtx = visualizerCanvas.getContext('2d');
 
+window.addEventListener('keydown', (e) => {
+
+    if (document.activeElement === presetInput) return;
+
+    const key = e.key.toUpperCase();
+
+    if (key === 'T') {
+        playThunder();
+        flashButton('sfx-thunder');
+    } else if (key === 'C') {
+        playCreak();
+        flashButton('sfx-creak');
+    } else if (key === 'W') {
+        playWail();
+        flashButton('sfx-wail');
+    } else if (key === 'B') {
+        playBell();
+        flashButton('sfx-bell');
+    }
+});
+
+function flashButton(buttonId) {
+    const btn = document.getElementById(buttonId);
+    if (!btn) return;
+    btn.classList.add('keyboard-active');
+    setTimeout(() => {
+        btn.classList.remove('keyboard-active');
+    }, 150);
+}
+
 powerBtn.addEventListener('click', () => {
     if (!isPoweredOn) {
 

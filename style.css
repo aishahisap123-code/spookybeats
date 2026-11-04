@@ -200,3 +200,11 @@ input[type="range"] {
     border-color: var(--ghost-green);
     color: var(--ghost-green);
 }
+
+.keyboard-active {
+    transform: scale(0.95);
+    background-color: #39ff14 !important;
+    color: #050308 !important;
+    box-shadow: 0 0 15px #39ff14;
+    transition: all 0.1s ease;
+}
