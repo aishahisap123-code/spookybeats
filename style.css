@@ -239,3 +239,26 @@ input[type="range"] {
     color: #050308;
     box-shadow: 0 0 12px rgba(57, 255, 20, 0.6);
 }
+
+.recorder-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+}
+
+#rec-status {
+    color: #8a859b;
+    font-family: inherit;
+    font-size: 0.95rem;
+
+}
+
+.btn:disabled, #download-btn:disabled {
+    background-color: #1a1523 !important;
+    color: #4a425c !important;
+    border: 1px solid #2a2238 !important;
+    cursor: not-allowed;
+    box-shadow: none !important;
+}

@@ -601,3 +601,72 @@ function triggerLightning() {
         }, 120);
     }, 60);
 }
+
+let mediaRecorder;
+let recordedChunks = [];
+let destStreamNode = null;
+
+const recBtn = document.getElementById('rec-btn');
+const downloadBtn = document.getElementById('download-btn');
+const recStatus = document.getElementById('rec-status');
+
+recBtn.addEventListener('click', () => {
+    if (!isPoweredOn) {
+        alert("Power on the audio engine first!");
+        return;
+    }
+
+    if (!mediaRecorder || mediaRecorder.state === "inactive") {
+        destStreamNode = audioCtx.createMediaStreamDestination();
+
+        masterGain.connect(destStreamNode);
+
+        recordedChunks = [];
+
+        try {
+            mediaRecorder = new MediaRecorder(destStreamNode.stream, { mimeType: 'audio/webm' });
+
+        } catch (e) {
+            mediaRecorder = new MediaRecorder(destStreamNode.stream);
+        }
+
+        mediaRecorder.ondataavailable = (event) => {
+            if (event.data.size > 0) {
+                recordedChunks.push(event.data);
+            }
+        };
+
+        mediaRecorder.onstop = () => {
+            const blob = new Blob(recordedChunks, { type: 'audio/webm' })
+            const audioUrl = URL.createObjectURL(blob);
+
+            downloadBtn.onclick = () => {
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = audioUrl;
+                a.download = 'haunted-manor-mix.webm';
+                document.body.appendChild(a);
+                a.click();
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(audioUrl);
+                }, 100);
+            };
+
+            downloadBtn.disabled = false;
+            recStatus.textContent = 'Recording Saved!';
+        };
+
+        mediaRecorder.start();
+        recBtn.textContent = 'Stop Recording';
+        recBtn.style.backgroundColor = '#ff3333';
+        recStatus.textContent = 'Recording live mix...';
+        downloadBtn.disabled = true;
+    } else if (mediaRecorder.state === "recording") {
+        mediaRecorder.stop();
+        recBtn.textContent = 'Start Recording';
+        recBtn.style.backgroundColor = '';
+        recStatus.textContent = 'Processing recording...';
+
+    }
+});
