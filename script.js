@@ -651,6 +651,10 @@ recBtn.addEventListener('click', () => {
                     document.body.removeChild(a);
                     window.URL.revokeObjectURL(audioUrl);
                 }, 100);
+
+                downloadBtn.disabled = true;
+                recStatus.textContent = 'Ready';
+                recordedChunks = [];
             };
 
             downloadBtn.disabled = false;
