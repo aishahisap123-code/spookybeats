@@ -200,7 +200,7 @@ function initWind() {
     noise.buffer = buffer;
     noise.loop = true;
 
-    const filter = audioCtx.createBufferSource();
+    const filter = audioCtx.createBiquadFilter();
     filter.type = 'lowpass';
     filter.frequency.value = 300;
 
@@ -383,7 +383,7 @@ function loadPreset(name) {
         if (!rainNode && (preset.rain ?? 0) > 0) initRain();
         if (rainGain) rainGain.gain.setTargetAtTime(preset.rain ?? 0, audioCtx.currentTime, 0.05);
 
-        if (!droneNode1 && (presetInput.drone ?? 0) > 0) initDrone();
+        if (!droneNode1 && (preset.drone ?? 0) > 0) initDrone();
         if (droneGain) droneGain.gain.setTargetAtTime(preset.drone ?? 0, audioCtx.currentTime, 0.05);
 
         if (!chimesGain && (preset.chimes ?? 0) > 0) initChimes();
