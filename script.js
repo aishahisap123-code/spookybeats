@@ -315,7 +315,7 @@ document.getElementById('drone-vol').addEventListener('input', (e) => {
     droneGain.gain.setTargetAtTime(e.target.value, audioCtx.currentTime, 0.05);
 });
 
-document.getElementById('chimes-vol').addEventListener('input', (e) => {
+document.getElementById('chime-vol').addEventListener('input', (e) => {
     if (!isPoweredOn) return;
     if (!chimesGain) initChimes();
     chimesGain.gain.setTargetAtTime(e.target.value, audioCtx.currentTime, 0.05);
