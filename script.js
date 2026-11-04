@@ -322,5 +322,94 @@ document.getElementById('chimes-vol').addEventListener('input', (e) => {
 });
 
 
+const presetInput = document.getElementById('preset-name');
+const savePresetBtn = document.getElementById('save-preset-btn');
+const presetListContainer = document.getElementById('preset-list');
 
+let savedPresets = JSON.parse(localStorage.getItem('manor_presets')) || {
+    "Spooky Storm": { wind: 0.5, rain: 0.8, drone: 0.2, chimes: 0.0 },
+    "Silent Crypt": { wind: 0.0, rain: 0.0, drone: 0.7, chimes: 0.3 }
+};
+
+function renderPresets() {
+    presetListContainer.innerHTML = '';
+    Object.keys(savedPresets).forEach(name => {
+        const chip = document.createElement('div');
+        chip.className = 'preset-chip';
+
+        const textSpan = document.createElement('span');
+        textSpan.textContent = name;
+        textSpan.style.cursor = 'pointer';
+        textSpan.addEventListener('click', () => {
+            loadPreset(name);
+        });
+
+        const deleteBtn = document.createElement('span');
+        deleteBtn.textContent = ' ×';
+        deleteBtn.style.cursor = 'pointer';
+        deleteBtn.style.marginLeft = '8px';
+        deleteBtn.style.color = '#ff6b6b';
+        deleteBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            delete savedPresets[name];
+            localStorage.setItem('manor_presets', JSON.stringify(savedPresets));
+            renderPresets();
+        });
+
+        chip.appendChild(textSpan);
+        chip.appendChild(deleteBtn);
+        presetListContainer.appendChild(chip);
+    });
+}
+
+function loadPreset(name) {
+    const preset = savedPresets[name];
+    if (!preset) return;
+
+    const windSlider = document.getElementById('wind-vol');
+    const rainSlider = document.getElementById('rain-vol');
+    const droneSlider = document.getElementById('drone-vol');
+    const chimesSlider = document.getElementById('chimes-vol');
+
+    windSlider.value = preset.wind ?? 0;
+    rainSlider.value = preset.rain ?? 0;
+    droneSlider.value = preset.drone ?? 0;
+    chimesSlider.value = preset.chimes ?? 0;
+
+    if (isPoweredOn) {
+        if (!windNode && preset.wind > 0) initWind();
+        if (windGain) windGain.gain.setTargetAtTime(preset.wind ?? 0, audioCtx.currentTime, 0.05);
+
+        if (!rainNode && (preset.rain ?? 0) > 0) initRain();
+        if (rainGain) rainGain.gain.setTargetAtTime(preset.rain ?? 0, audioCtx.currentTime, 0.05);
+
+        if (!droneNode1 && (presetInput.drone ?? 0) > 0) initDrone();
+        if (droneGain) droneGain.gain.setTargetAtTime(preset.drone ?? 0, audioCtx.currentTime, 0.05);
+
+        if (!chimesGain && (preset.chimes ?? 0) > 0) initChimes();
+        if (chimesGain) chimesGain.gain.setTargetAtTime(preset.chimes ?? 0, audioCtx.currentTime, 0.05);
+    }
+
+    console.log(`Loaded preset: ${name}`)
+
+}
+
+savePresetBtn.addEventListener('click', () => {
+    const name = presetInput.value.trim();
+    if (!name) return alert('Please enter a preset name!');
+
+    const windVal = parseFloat(document.getElementById('wind-vol').value);
+    const rainVal = parseFloat(document.getElementById('rain-vol').value);
+    const droneVal = parseFloat(document.getElementById('drone-vol').value);
+    const chimesVal = parseFloat(document.getElementById('chimes-vol').value);
+
+    savedPresets[name] = { wind: windVal, rain: rainVal, drone: droneVal, chimes: chimesVal };
+    localStorage.setItem('manor_presets', JSON.stringify(savedPresets));
+
+    presetInput.value = '';
+    renderPresets();
+    console.log(`Saved preset: ${name}`);
+});
+
+renderPresets();
 
