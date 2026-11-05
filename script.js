@@ -674,3 +674,60 @@ recBtn.addEventListener('click', () => {
 
     }
 });
+
+const organNotes = {
+    'A': 220.00,
+    'S': 246.94,
+    'D': 261.63,
+    'F': 293.66,
+    'G': 329.63,
+    'H': 349.23,
+    'J': 392.00,
+    'K': 440.00
+
+};
+
+function playOrganNote(freq) {
+    if (!isPoweredOn || !audioCtx) return;
+
+    const now = audioCtx.currentTime;
+
+    const osc1 = audioCtx.createOscillator();
+    const osc2 = audioCtx.createOscillator();
+    const noteGain = audioCtx.createGain();
+
+    osc1.type = 'sawtooth';
+    osc1.frequency.setValueAtTime(freq, now);
+
+    osc2.type = 'sine';
+    osc2.frequency.setValueAtTime(freq * 0.5, now);
+
+    noteGain.gain.setValueAtTime(0, now);
+    noteGain.gain.linearRampToValueAtTime(0.2, now + 0.05);
+    noteGain.gain.exponentialRampToValueAtTime(0.0001, now + 1.2);
+
+    const filter = audioCtx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(1200, now);
+
+    osc1.connect(filter);
+    osc2.connect(filter);
+    filter.connect(noteGain);
+
+    noteGain.connect(masterGain);
+    if (reverbNode) noteGain.connect(reverbNode);
+
+    osc1.start(now);
+    osc2.start(now);
+    osc1.stop(now + 1.2);
+    osc2.stop(now + 1.2);
+}
+
+document.querySelectorAll('.organ-key').forEach(keyBtn => {
+    keyBtn.addEventListener('click', () => {
+        const freq = parseFloat(keyBtn.dataset.note);
+        playOrganNote(freq);
+        keyBtn.classList.add('active');
+        setTimeout(() => keyBtn.classList.remove('active'), 200);
+    });
+});
