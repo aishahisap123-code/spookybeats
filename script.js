@@ -31,6 +31,19 @@ window.addEventListener('keydown', (e) => {
         playBell();
         flashButton('sfx-bell');
     }
+
+    if (organNotes[key]) {
+        playOrganNote(organNotes[key]);
+
+        const keyButtons = document.querySelectorAll('.organ-key');
+        keyButtons.forEach(btn => {
+            if (parseFloat(btn.dataset.note) === organNotes[key]) {
+                btn.classList.add('active');
+                setTimeout(() => btn.classList.remove('active'), 200);
+            }
+        })
+    }
+
 });
 
 function flashButton(buttonId) {
@@ -684,7 +697,6 @@ const organNotes = {
     'H': 349.23,
     'J': 392.00,
     'K': 440.00
-
 };
 
 function playOrganNote(freq) {
@@ -724,8 +736,9 @@ function playOrganNote(freq) {
 }
 
 document.querySelectorAll('.organ-key').forEach(keyBtn => {
-    keyBtn.addEventListener('click', () => {
-        const freq = parseFloat(keyBtn.dataset.note);
+    keyBtn.addEventListener('click', (e) => {
+        const btn = e.currentTarget;
+        const freq = parseFloat(btn.dataset.note);
         playOrganNote(freq);
         keyBtn.classList.add('active');
         setTimeout(() => keyBtn.classList.remove('active'), 200);
