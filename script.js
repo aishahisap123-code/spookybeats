@@ -18,13 +18,13 @@ window.addEventListener('keydown', (e) => {
 
     const key = e.key.toUpperCase();
 
-    if (key === 'T') {
+    if (key === 'V') {
         playThunder();
         flashButton('sfx-thunder');
     } else if (key === 'C') {
         playCreak();
         flashButton('sfx-creak');
-    } else if (key === 'W') {
+    } else if (key === 'N') {
         playWail();
         flashButton('sfx-wail');
     } else if (key === 'B') {
