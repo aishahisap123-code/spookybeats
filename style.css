@@ -266,7 +266,7 @@ input[type="range"] {
 .organ-keyboard {
     display: flex;
     gap: 8px;
-    justify-content: spave-between;
+    justify-content: space-between;
     margin-top: 15px;
 }
 
@@ -298,6 +298,17 @@ input[type="range"] {
     transform: translateY(2px);
 }
 
+.organ-key.black-key {
+    background: #09060f;
+    border-color: #241c33;
+    height: 100px;
+    flex: 0.8;
+}
+
+.organ-key.black-key .key-label {
+    color: #bfa5eb;
+}
+
 .key-label {
     font-weight: bold;
     font-size: 1.1rem;
@@ -314,4 +325,41 @@ input[type="range"] {
 
 .organ-key span {
     pointer-events: none;
+}
+
+.sheet-note {
+    background: #1a1526;
+    border: 1px solid #3d3254;
+    color: #a89bbd;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+.sheet-note.active-target {
+    border-color: #39ff14;
+    color: #ffffff;
+    box-shadow: 0 0 8px rgba(57, 255, 20, 0.4);
+}
+
+.sheet-note.correct {
+    background: #39ff14;
+    color: #050308;
+    border-color: #39ff14;
+    font-weight: bold;
+}
+
+.sheet-note.wrong {
+    background: #ff3366;
+    color: #ffffff;
+    border-color: #ff3366;
+    animation: shake 0.3s ease;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    75% { transform: translateX(4px); }
 }
