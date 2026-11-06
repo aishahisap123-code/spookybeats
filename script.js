@@ -767,7 +767,6 @@ function highlightOrganKey(freq) {
     });
 }
 
-
 const sheetNotes = document.querySelectorAll('.sheet-note');
 const practiceStatus = document.getElementById('practice-status');
 const togglePracticeBtn = document.getElementById('toggle-practice-btn');
@@ -788,23 +787,24 @@ function updateSheetUI() {
 function checkPracticeNote(playedFreq) {
     const targetFreq = songSequence[currentNoteIndex];
 
-    if (Math.abs(playedFreq - targetFreq) < 0.1) {
-       
+    if (Math.abs(playedFreq - targetFreq) < 0.5) {
         currentNoteIndex++;
-        updateSheetUI();
 
         if (currentNoteIndex >= songSequence.length) {
-            practiceStatus.textContent = 'Perfect! You completed the song!';
+            practiceStatus.textContent = '🎉 Perfect! You completed the song!';
             practiceStatus.style.color = '#39ff14';
+            updateSheetUI();
             setTimeout(() => {
                 resetPractice();
-            }, 2500);
+            }, 3000);
         } else {
+            updateSheetUI();
             practiceStatus.textContent = `Nice! Keep going... (${currentNoteIndex}/${songSequence.length})`;
             practiceStatus.style.color = '#8a859b';
         }
+    } else if (currentNoteIndex > 0 && Math.abs(playedFreq - songSequence[currentNoteIndex - 1]) < 0.5) {
+        return;
     } else {
-    
         const currentBadge = sheetNotes[currentNoteIndex];
         if (currentBadge) {
             currentBadge.classList.add('wrong');
@@ -827,7 +827,6 @@ function resetPractice() {
     }
 }
 
-
 togglePracticeBtn.addEventListener('click', () => {
     isPracticeMode = !isPracticeMode;
     if (isPracticeMode) {
@@ -842,7 +841,6 @@ togglePracticeBtn.addEventListener('click', () => {
     resetPractice();
 });
 
-// Demo Song Sequence Player
 const demoBtn = document.getElementById('play-demo-btn');
 demoBtn.addEventListener('click', () => {
     if (!isPoweredOn) {
@@ -864,7 +862,6 @@ demoBtn.addEventListener('click', () => {
             playOrganNote(freq);
             highlightOrganKey(freq);
 
-            
             sheetNotes.forEach(b => b.classList.remove('correct', 'active-target'));
             sheetNotes[index].classList.add('active-target');
 
@@ -881,17 +878,13 @@ demoBtn.addEventListener('click', () => {
     });
 });
 
-
-
-
-
 document.querySelectorAll('.organ-key').forEach(keyBtn => {
     keyBtn.addEventListener('click', (e) => {
         const btn = e.currentTarget;
         const freq = parseFloat(btn.dataset.note);
         playOrganNote(freq);
-        keyBtn.classList.add('active');
-        setTimeout(() => keyBtn.classList.remove('active'), 200);
+        btn.classList.add('active');
+        setTimeout(() => btn.classList.remove('active'), 200);
     });
 });
 
