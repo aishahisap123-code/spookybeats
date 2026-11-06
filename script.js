@@ -760,7 +760,7 @@ function playOrganNote(freq) {
 function highlightOrganKey(freq) {
     const keyButtons = document.querySelectorAll('.organ-key');
     keyButtons.forEach(btn => {
-        if (Math.abs(parseFloat(btn.dataset.note) - freq) < 0.1) {
+        if (Math.abs(parseFloat(btn.dataset.note) - freq) < 0.5) {
             btn.classList.add('active');
             setTimeout(() => btn.classList.remove('active'), 200);
         }
@@ -785,6 +785,8 @@ function updateSheetUI() {
 }
 
 function checkPracticeNote(playedFreq) {
+    if (currentNoteIndex >= songSequence.length) return;
+
     const targetFreq = songSequence[currentNoteIndex];
 
     if (Math.abs(playedFreq - targetFreq) < 0.5) {
