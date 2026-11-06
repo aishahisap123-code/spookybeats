@@ -704,6 +704,19 @@ const organNotes = {
     'K': 523.25
 };
 
+const songSequence = [
+    261.63,
+    349.23,
+    392.00,
+    440.00,
+    349.23,
+    392.00,
+    440.00
+];
+
+let isPracticeMode = false;
+let currentNoteIndex = 0;
+
 function playOrganNote(freq) {
     if (!isPoweredOn || !audioCtx) return;
 
@@ -738,7 +751,139 @@ function playOrganNote(freq) {
     osc2.start(now);
     osc1.stop(now + 1.2);
     osc2.stop(now + 1.2);
+
+    if (isPracticeMode) {
+        checkPracticeNote(freq);
+    }
 }
+
+function highlightOrganKey(freq) {
+    const keyButtons = document.querySelectorAll('.organ-key');
+    keyButtons.forEach(btn => {
+        if (Math.abs(parseFloat(btn.dataset.note) - freq) < 0.1) {
+            btn.classList.add('active');
+            setTimeout(() => btn.classList.remove('active'), 200);
+        }
+    });
+}
+
+
+const sheetNotes = document.querySelectorAll('.sheet-note');
+const practiceStatus = document.getElementById('practice-status');
+const togglePracticeBtn = document.getElementById('toggle-practice-btn');
+
+function updateSheetUI() {
+    sheetNotes.forEach((badge, idx) => {
+        badge.classList.remove('active-target', 'correct', 'wrong');
+        if (isPracticeMode) {
+            if (idx < currentNoteIndex) {
+                badge.classList.add('correct');
+            } else if (idx === currentNoteIndex) {
+                badge.classList.add('active-target');
+            }
+        }
+    });
+}
+
+function checkPracticeNote(playedFreq) {
+    const targetFreq = songSequence[currentNoteIndex];
+
+    if (Math.abs(playedFreq - targetFreq) < 0.1) {
+       
+        currentNoteIndex++;
+        updateSheetUI();
+
+        if (currentNoteIndex >= songSequence.length) {
+            practiceStatus.textContent = 'Perfect! You completed the song!';
+            practiceStatus.style.color = '#39ff14';
+            setTimeout(() => {
+                resetPractice();
+            }, 2500);
+        } else {
+            practiceStatus.textContent = `Nice! Keep going... (${currentNoteIndex}/${songSequence.length})`;
+            practiceStatus.style.color = '#8a859b';
+        }
+    } else {
+    
+        const currentBadge = sheetNotes[currentNoteIndex];
+        if (currentBadge) {
+            currentBadge.classList.add('wrong');
+            setTimeout(() => currentBadge.classList.remove('wrong'), 400);
+        }
+        practiceStatus.textContent = '❌ Oops, wrong note! Try that step again.';
+        practiceStatus.style.color = '#ff3366';
+    }
+}
+
+function resetPractice() {
+    currentNoteIndex = 0;
+    updateSheetUI();
+    if (isPracticeMode) {
+        practiceStatus.textContent = 'Practice Mode active! Play the highlighted note.';
+        practiceStatus.style.color = '#39ff14';
+    } else {
+        practiceStatus.textContent = 'Press notes on your keyboard or click the keys to play along!';
+        practiceStatus.style.color = '#8a859b';
+    }
+}
+
+
+togglePracticeBtn.addEventListener('click', () => {
+    isPracticeMode = !isPracticeMode;
+    if (isPracticeMode) {
+        togglePracticeBtn.textContent = 'Mode: Practice (Active)';
+        togglePracticeBtn.style.background = '#39ff14';
+        togglePracticeBtn.style.color = '#050308';
+    } else {
+        togglePracticeBtn.textContent = 'Mode: Free Play';
+        togglePracticeBtn.style.background = '#2a2238';
+        togglePracticeBtn.style.color = '#e2d9f3';
+    }
+    resetPractice();
+});
+
+// Demo Song Sequence Player
+const demoBtn = document.getElementById('play-demo-btn');
+demoBtn.addEventListener('click', () => {
+    if (!isPoweredOn) {
+        alert("Power on the audio engine first!");
+        return;
+    }
+
+    const wasPracticing = isPracticeMode;
+    isPracticeMode = false;
+
+    demoBtn.disabled = true;
+    demoBtn.textContent = 'Playing...';
+
+    let delay = 0;
+    const stepDurations = [250, 250, 250, 400, 250, 250, 400];
+
+    songSequence.forEach((freq, index) => {
+        setTimeout(() => {
+            playOrganNote(freq);
+            highlightOrganKey(freq);
+
+            
+            sheetNotes.forEach(b => b.classList.remove('correct', 'active-target'));
+            sheetNotes[index].classList.add('active-target');
+
+            if (index === songSequence.length - 1) {
+                setTimeout(() => {
+                    demoBtn.disabled = false;
+                    demoBtn.textContent = '▶ Play Demo';
+                    isPracticeMode = wasPracticing;
+                    resetPractice();
+                }, 500);
+            }
+        }, delay);
+        delay += stepDurations[index];
+    });
+});
+
+
+
+
 
 document.querySelectorAll('.organ-key').forEach(keyBtn => {
     keyBtn.addEventListener('click', (e) => {
@@ -748,4 +893,16 @@ document.querySelectorAll('.organ-key').forEach(keyBtn => {
         keyBtn.classList.add('active');
         setTimeout(() => keyBtn.classList.remove('active'), 200);
     });
+});
+
+window.addEventListener('keydown', (e) => {
+    if (document.activeElement === presetInput) return;
+
+    const key = e.key.toUpperCase();
+
+    if (organNotes[key]) {
+        const freq = organNotes[key];
+        playOrganNote(freq);
+        highlightOrganKey(freq);
+    }
 });
